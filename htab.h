@@ -19,6 +19,8 @@
 #include <stdbool.h>
 #include <string.h> 
 
+#define MIN_SPACE_TAKEN 0.25
+#define MAX_SPACE_TAKEN 0.75
 
 // Key type
 typedef const char * htab_key_t;
@@ -40,35 +42,35 @@ size_t htab_hash_function(htab_key_t str);
 // Inicialization of a table
 htab_t * htab_init(size_t n);
 
+// Table destructor
+void htab_free(htab_t * t);
+
+// Returns pointer to the key-value pair in t, NULL if not found
+htab_pair_t * htab_find(htab_t * t, htab_key_t key);
+
 // Returns total number of items
 size_t htab_items_count(const htab_t * t);
 
-// Returns size of array
+// Returns length of array
 size_t htab_length(const htab_t * t);
 
+// Prints table
+void htab_print(htab_t * t);
+
+// Returns pointer to the key-value pair in t, adds new key-value pair if not found
+htab_pair_t * htab_lookup_add(htab_t * t, htab_key_t key);
+// -----------------------------------  NOT IMPLEMENTED YET  -----------------------------------
 // Increases / decreases size of t
 void * htab_resize(htab_t *t, size_t n);
 
 // Destructs key-value pair. Returns false if not found
 bool htab_erase(htab_t * t, htab_key_t key);
 
-// Returns pointer to the key-value pair in t, NULL if not found
-htab_pair_t * htab_find(htab_t * t, htab_key_t key);
-
-// Returns pointer to the key-value pair in t, adds new key-value pair if not found
-htab_pair_t * htab_lookup_add(htab_t * t, htab_key_t key);
-
 // Deletes all elements
 void htab_clear(htab_t * t);
 
-// Table destructor
-void htab_free(htab_t * t);
-
-// Copies table
+// Copies elements of table t in a new table
 htab_t * htab_copy(htab_t t);
-
-// Prints table
-void htab_print(htab_t * t);
 
 
 

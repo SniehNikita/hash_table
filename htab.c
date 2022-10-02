@@ -57,9 +57,7 @@ htab_t * htab_init(size_t n) {
 }
 
 
-// htab pointer
-// pointer to the array
-// pointer to each elements
+
 void htab_free(htab_t * t) {
     htab_item_t *p = NULL;
     htab_item_t *pd = NULL;
@@ -85,4 +83,93 @@ void htab_free(htab_t * t) {
     // Free pointer
     free(t);
     t = NULL;
+}
+
+
+
+htab_item_t * htab_find_item(htab_t * t, htab_key_t key) {
+    htab_item_t *item;
+
+    item = t->arr_ptr[htab_hash_function(key) % (t->arr_size)];
+    if (item == NULL) {
+        return NULL;
+    }
+
+    while (item->pair.key != key && item->next != NULL) {
+        item = item->next;
+    }
+
+    if (item->pair.key == key) {
+        return item;
+    }
+    
+    return NULL;
+}
+
+
+
+htab_pair_t * htab_find(htab_t * t, htab_key_t key) {
+    htab_item_t *item;
+
+    item = htab_find_item(t, key);
+    
+    if (item != NULL) {
+        return &item->pair;
+    }
+
+    return NULL;
+}
+
+
+
+size_t htab_items_count(const htab_t * t) {
+    return t->size;
+}
+
+
+
+size_t htab_length(const htab_t * t) {
+    return t->arr_size;
+}
+
+
+
+void htab_print(htab_t * t) {
+    printf("array size: %ld\nelements count: %ld\n", t->arr_size, t->size);
+    for (size_t i = 0; i < t->arr_size; i++) {
+        htab_item_t *item = t->arr_ptr[i]; 
+        while (item != NULL) {
+            printf("[\"%s\": %d]->", item->pair.key, item->pair.value);
+            item = item->next;
+        }
+        printf("NULL\n");
+    }
+}
+
+
+
+htab_pair_t * htab_lookup_add(htab_t * t, htab_key_t key) {
+    htab_item_t *item;
+    
+    item = htab_find_item(t, key);
+
+    if (item != NULL) {
+        return &item->pair;
+    }    
+
+    if ( (t->size + 1) / t->arr_size > MAX_SPACE_TAKEN) {
+        // TODO
+    }
+
+    if ((item = (htab_item_t *) malloc(sizeof(htab_item_t))) == NULL) {
+        // TODO Memory alloc error
+        return NULL;
+    }
+    item->pair.key = key;
+    item->pair.value = 0;
+
+    item->next = t->arr_ptr[htab_hash_function(key) % (t->arr_size)];
+    t->arr_ptr[htab_hash_function(key) % (t->arr_size)] = item;
+
+    return &item->pair;
 }
