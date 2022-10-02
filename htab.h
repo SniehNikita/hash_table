@@ -59,17 +59,17 @@ void htab_print(htab_t * t);
 
 // Returns pointer to the key-value pair in t, adds new key-value pair if not found
 htab_pair_t * htab_lookup_add(htab_t * t, htab_key_t key);
-// -----------------------------------  NOT IMPLEMENTED YET  -----------------------------------
+
 // Increases / decreases size of t
 void * htab_resize(htab_t *t, size_t n);
-
+// -----------------------------------  NOT IMPLEMENTED YET  -----------------------------------
 // Destructs key-value pair. Returns false if not found
 bool htab_erase(htab_t * t, htab_key_t key);
 
 // Deletes all elements
 void htab_clear(htab_t * t);
 
-// Copies elements of table t in a new table
+// New instance of the table
 htab_t * htab_copy(htab_t t);
 
 

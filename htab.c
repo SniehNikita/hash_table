@@ -171,5 +171,47 @@ htab_pair_t * htab_lookup_add(htab_t * t, htab_key_t key) {
     item->next = t->arr_ptr[htab_hash_function(key) % (t->arr_size)];
     t->arr_ptr[htab_hash_function(key) % (t->arr_size)] = item;
 
+    t->size++;
+
     return &item->pair;
+}
+
+
+
+void * htab_resize(htab_t *t, size_t n) {
+     if (n < 1) {
+        // TODO Bad size of array error
+        return NULL;
+    }
+
+    htab_item_t **new_arr_ptr;
+    if ((new_arr_ptr = (htab_item_t **) malloc(n * sizeof(htab_item_t *))) == NULL) {
+        // TODO Memory alloc error
+        return NULL;
+    }
+
+    // NULLs every pointer in elements
+    for (size_t i = 0; i < n; i++) {
+        new_arr_ptr[i] = NULL;
+    }
+
+    htab_item_t *item;
+    for (size_t i = 0; i < t->arr_size; i++) {
+        item = t->arr_ptr[i];
+        while(item != NULL) {
+            htab_item_t *tmp;
+            tmp = item->next;
+            item->next = new_arr_ptr[htab_hash_function(item->pair.key) % n];
+            new_arr_ptr[htab_hash_function(item->pair.key) % n] = item;
+            item = tmp;
+        }
+    }
+
+    // Free array
+    free(t->arr_ptr);
+    t->arr_ptr = new_arr_ptr;
+
+    t->arr_size = n;
+
+    return (void *)0;
 }
