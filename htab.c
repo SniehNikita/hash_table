@@ -157,10 +157,6 @@ htab_pair_t * htab_lookup_add(htab_t * t, htab_key_t key) {
         return &item->pair;
     }    
 
-    if ( (t->size + 1) / t->arr_size > MAX_SPACE_TAKEN) {
-        // TODO
-    }
-
     if ((item = (htab_item_t *) malloc(sizeof(htab_item_t))) == NULL) {
         // TODO Memory alloc error
         return NULL;
@@ -172,6 +168,10 @@ htab_pair_t * htab_lookup_add(htab_t * t, htab_key_t key) {
     t->arr_ptr[htab_hash_function(key) % (t->arr_size)] = item;
 
     t->size++;
+
+    if ((double)t->size / (double)t->arr_size > MAX_SPACE_TAKEN) {
+        htab_resize(t, t->arr_size * 2);
+    }
 
     return &item->pair;
 }
@@ -214,4 +214,52 @@ void * htab_resize(htab_t *t, size_t n) {
     t->arr_size = n;
 
     return (void *)0;
+}
+
+
+
+bool htab_erase(htab_t * t, htab_key_t key) {
+    htab_item_t *item;
+
+    item = t->arr_ptr[htab_hash_function(key) % (t->arr_size)];
+    if (item == NULL) {
+        return false;
+    }    
+    
+    // This will save pointer to the item, so when certain key will be found, it will be able to free it and connect previous item with the next one
+    htab_item_t *item_last = NULL;
+
+    if (item->pair.key != key) {
+        item_last = item;
+        item = item->next;
+
+        while (item->pair.key != key && item->next != NULL) {
+            item_last = item; // Contains pointer to the current element 
+            item = item->next;
+        }
+    }
+
+    // If wasn't found
+    if (item->pair.key == NULL) {
+        return false;
+    }
+
+    // If it was first element
+    if (item_last == NULL) {
+        t->arr_ptr[htab_hash_function(key) % (t->arr_size)] = item->next;
+        free(item);
+    } else {
+        item = item->next;
+        free(item_last->next);
+        item_last->next = item;
+    }
+    
+    t->size--;
+
+    if ((double)t->size / (double)t->arr_size < MIN_SPACE_TAKEN) {
+        int new_n = (t->arr_size / 2 < 1) ? 1 : t->arr_size / 2;
+        htab_resize(t, new_n);
+    }
+
+    return true;
 }
