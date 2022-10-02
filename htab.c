@@ -91,6 +91,7 @@ htab_item_t * htab_find_item(htab_t * t, htab_key_t key) {
     htab_item_t *item;
 
     item = t->arr_ptr[htab_hash_function(key) % (t->arr_size)];
+
     if (item == NULL) {
         return NULL;
     }
@@ -164,11 +165,13 @@ htab_pair_t * htab_lookup_add(htab_t * t, htab_key_t key) {
     item->pair.key = key;
     item->pair.value = 0;
 
+    // Insert item at the start of chain
     item->next = t->arr_ptr[htab_hash_function(key) % (t->arr_size)];
     t->arr_ptr[htab_hash_function(key) % (t->arr_size)] = item;
 
     t->size++;
 
+    // Check if table is not overfilled/underfilled
     if ((double)t->size / (double)t->arr_size > MAX_SPACE_TAKEN) {
         htab_resize(t, t->arr_size * 2);
     }
@@ -240,7 +243,7 @@ bool htab_erase(htab_t * t, htab_key_t key) {
     }
 
     // If wasn't found
-    if (item->pair.key == NULL) {
+    if (item == NULL) {
         return false;
     }
 
