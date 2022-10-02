@@ -9,7 +9,7 @@
 
 CC = gcc
 CFLAGS = -Wall -Wextra --std=c11
-EXEC = lib_htab test-dynamic test-static
+EXEC = lib_htab test-static
 
 # List all obj files to include into library
 HTAB_OBJS = htab.o
@@ -24,10 +24,10 @@ lib_htab: $(HTAB_OBJS)
 	$(CC)  $(CFLAGS) -fPIC -shared $^ -o lib_htab.so
 
 test-static:
-	$(CC) $(CFLAGS) -L. lib_htab.a test.c -o $@
+	$(CC) $(CFLAGS) test.c -o $@ -L. lib_htab.a
 
-test-dynamic:
-	$(CC) $(CFLAGS) -L. lib_htab.so test.c -o $@
+#test-dynamic:
+#	$(CC) $(CFLAGS) test.c -o $@ -L. lib_htab.so
 
 %.o: %.c
 	$(CC) -c $(CFLAGS) $^ -o $@
@@ -38,3 +38,7 @@ clear:
 	rm -f test-dynamic
 	rm -f lib_htab.so
 	rm -f lib_htab.a
+
+zip:
+	rm -f zip.zip
+	zip "zip.zip" htab.c htab.h makefile test.c
