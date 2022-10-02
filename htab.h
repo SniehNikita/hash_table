@@ -51,8 +51,8 @@ htab_pair_t * htab_find(htab_t * t, htab_key_t key);
 // Returns total number of items
 size_t htab_items_count(const htab_t * t);
 
-// Returns length of array
-size_t htab_length(const htab_t * t);
+// Returns size of a table
+size_t htab_size(const htab_t * t);
 
 // Prints table
 void htab_print(htab_t * t);
@@ -62,7 +62,7 @@ htab_pair_t * htab_lookup_add(htab_t * t, htab_key_t key);
 
 // Increases / decreases size of t
 void * htab_resize(htab_t *t, size_t n);
-// -----------------------------------  NOT IMPLEMENTED YET  -----------------------------------
+
 // Destructs key-value pair. Returns false if not found
 bool htab_erase(htab_t * t, htab_key_t key);
 

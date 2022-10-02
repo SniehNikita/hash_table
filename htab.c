@@ -59,17 +59,17 @@ htab_t * htab_init(size_t n) {
 
 
 void htab_free(htab_t * t) {
-    htab_item_t *p = NULL;
-    htab_item_t *pd = NULL;
+    htab_item_t *item = NULL;
+    htab_item_t *item_erase = NULL;
 
     // Free each element in the array
     for (size_t i = 0; i < t->arr_size; i++) {        
-        p = t->arr_ptr[i];
-        while (p != NULL) {
-            pd = p;
-            p = p->next;
-            free(pd);
-            pd = NULL;
+        item = t->arr_ptr[i];
+        while (item != NULL) {
+            item_erase = item;
+            item = item->next;
+            free(item_erase);
+            item_erase = NULL;
         }
         t->arr_ptr[i] = NULL;
     }
@@ -128,7 +128,7 @@ size_t htab_items_count(const htab_t * t) {
 
 
 
-size_t htab_length(const htab_t * t) {
+size_t htab_size(const htab_t * t) {
     return t->arr_size;
 }
 
@@ -262,4 +262,50 @@ bool htab_erase(htab_t * t, htab_key_t key) {
     }
 
     return true;
+}
+
+
+
+void htab_clear(htab_t * t) {
+    htab_item_t *item = NULL;
+    htab_item_t *item_erase = NULL;
+
+    // Free each element in the array
+    for (size_t i = 0; i < t->arr_size; i++) {        
+        item = t->arr_ptr[i];
+        while (item != NULL) {
+            item_erase = item;
+            item = item->next;
+            free(item_erase);
+            item_erase = NULL;
+        }
+        t->arr_ptr[i] = NULL;
+    }
+
+    t->size = 0;
+}
+
+
+
+htab_t * htab_copy(htab_t t) {
+    htab_t *new_htab = htab_init(t.arr_size);
+
+    htab_item_t *item;
+    htab_item_t *new_item;
+    for (size_t i = 0; i < t.arr_size; i++) {
+        item = t.arr_ptr[i];
+        while(item != NULL) {
+            if ((new_item = (htab_item_t *) malloc(sizeof(htab_item_t))) == NULL) {
+                // TODO Memory alloc error
+                return NULL;
+            }
+            new_item->pair.key = item->pair.key;
+            new_item->pair.value = item->pair.value;
+
+            new_item->next = new_htab->arr_ptr[htab_hash_function(new_item->pair.key) % (new_htab->arr_size)];
+            new_htab->arr_ptr[htab_hash_function(new_item->pair.key) % (new_htab->arr_size)] = item;
+        }
+    }    
+
+    return new_htab;
 }
